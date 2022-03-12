@@ -1,0 +1,126 @@
+<template>
+    <section class="section">
+        <div class="row" >
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <router-link to="/itemlist" class="nav-link" id="home-tab">商品列表</router-link>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <router-link to="/itemlist/edit" class="nav-link" id="profile-tab" >新增商品</router-link>
+                            </li>
+                        </ul>
+                    </div>
+                    <transition name="trans-content" mode="out-in">
+                        <div class="d-flex justify-content-center loading" v-if="isLoading" :key="Block-2">
+                            <img src="../assets/images/loaders/hearts.svg" style="width: 5rem;" alt="audio">
+                        </div>
+                        <div class="card-content" v-else>
+                            <div class="card-body">
+                                <router-view :ItemList="Items"></router-view>
+                            </div>
+                            <div class="div-pagination" v-if="this.$route.path=='/itemlist'">
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination pagination-primary justify-content-end">
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">
+                                                <span aria-hidden="true"><i class="bi bi-chevron-left"></i></span>
+                                            </a>
+                                        </li>
+                                        <li class="page-item" :class="{ active: pageItem==Page }" v-for="pageItem of TotalPage" :key="pageItem">
+                                            <a class="page-link" href="#">
+                                                {{ pageItem }}
+                                            </a>
+                                        </li>
+                                        <li class="page-item" >
+                                            <a class="page-link" href="#">
+                                                <span aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </transition>
+                </div>
+            </div>
+        </div>
+    </section>
+</template>
+
+<script>
+export default {
+    name: "ItemList",
+    data() {
+        return {
+            Items: [],
+            Page: 1,
+            TotalPage: 1,
+            TotalRow: 0,
+            isLoading: false,
+        }
+    },
+    methods: {
+        async getItems() {
+            this.isLoading=true;
+            return await fetch("http://localhost:1015/items?page="+this.Page)
+                            .then( result=>{
+                                return result.json();
+                            });
+        },
+    },
+    async created() {
+        let result=await this.getItems();
+        window.setTimeout( ()=>{
+            this.isLoading=false;
+            this.Items=result.data;
+            this.TotalPage=result.totalPage;
+            this.TotalRow=result.dataCount;
+        }, 3000);
+    },
+    async mounted() {
+        // console.log(this.$route.path);
+        console.log(await this.getItems());
+    },
+}
+</script>
+
+<style scoped>
+.router-link-exact-active {
+    border: none;
+    color: #435ebe;
+    position: relative
+}
+.router-link-exact-active {
+    background-color: #f2f7ff !important;
+    border-color: #dee2e6 #dee2e6 #f2f7ff;
+    color: #495057
+}
+.router-link-exact-active:after {
+    background-color: #435ebe;
+    bottom: 0;
+    box-shadow: 0 2px 5px rgba(67, 94, 190, .5);
+    content: "";
+    height: 2px;
+    left: 0;
+    position: absolute;
+    width: 100%
+}
+.div-pagination {
+    padding: 0rem 1.5rem 0rem 1.5rem;
+}
+.loading {
+    height: 70vh;
+}
+.card {
+    height: auto;
+}
+.trans-content-enter-active, .v-leave-active {
+    transition: opacity 0.7s;
+}
+.trans-content-enter-from, .v-leave-to {
+    opacity: 0;
+}
+</style>
