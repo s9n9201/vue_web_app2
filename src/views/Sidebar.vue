@@ -45,6 +45,7 @@ export default {
         },
         addSubMenuActive(MenuIndex, SubIndex) {
             //console.log("addSubMenuActive > "+MenuIndex+" > "+SubIndex+"");
+            console.log("TEST");
             this.ActiveMenu=this.ActiveMenu.map( (menuObj, index)=> {
                 menuObj.subArr=menuObj.subArr.map( (subObj, i) => {
                     return MenuIndex===index && SubIndex===i ? {...subObj, isActive: true} : {...subObj, isActive: false};
