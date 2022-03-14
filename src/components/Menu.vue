@@ -21,6 +21,9 @@ export default {
     name: "Menu",
     components: {
     },
+    emits: {
+        "add-menu-active": null,
+    },
     props: {
         MainMenu: {
             type: Array,
