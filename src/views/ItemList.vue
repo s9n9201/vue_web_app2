@@ -14,7 +14,7 @@
                         </ul>
                     </div>
                     <transition name="trans-content" mode="out-in">
-                        <div class="d-flex justify-content-center loading" v-if="isLoading" :key="Block-2">
+                        <div id="loading_id" class="d-flex justify-content-center loading" v-if="isLoading">
                             <img src="../assets/images/loaders/hearts.svg" style="width: 5rem;" alt="audio">
                         </div>
                         <div class="card-content" v-else>
@@ -64,26 +64,50 @@ export default {
     },
     methods: {
         async getItems() {
-            this.isLoading=true;
-            return await fetch("http://localhost:1015/items?page="+this.Page)
+            return await fetch(`http://localhost:1015/items?page=${this.Page}`)
                             .then( result=>{
                                 return result.json();
                             });
         },
-    },
-    async created() {
-        let result=await this.getItems();
-        window.setTimeout( ()=>{
-            this.isLoading=false;
+        initData(result) {
             this.Items=result.data;
             this.TotalPage=result.totalPage;
             this.TotalRow=result.dataCount;
-        }, 3000);
+        },
+    },
+    async created() {
+        this.isLoading=true;
+        let result=await this.getItems();
+        this.isLoading=false;
+        this.initData(result);
+        this.$watch(
+                ()=>this.$route.path,
+                async (to)=>{
+                    if (to==="/itemlist") {
+                        this.isLoading = true;
+                        result = await this.getItems()
+                        this.isLoading = false;
+                        this.initData(result);
+                    }
+                }
+        );
     },
     async mounted() {
         // console.log(this.$route.path);
-        console.log(await this.getItems());
+        //console.log(await this.getItems());
     },
+    async beforeRouteUpdate(to) {
+        if (to.hash!=="#" && to.path==="/itemlist") {   //不等於#，是為了避免第一層點了也觸發。
+            //如果用這個來換頁的話，會導致我點了商品列表的頁籤，頁籤還沒上active，就開始reload，reload完才出現active，若要排除此狀況，可能要把取資料的function做在list。
+            // this.isLoading=true;
+            // let result=await this.getItems();
+            // this.isLoading=false;
+            // this.Items=result.data;
+            // this.TotalPage=result.totalPage;
+            // this.TotalRow=result.dataCount;
+        }
+    },
+
 }
 </script>
 
