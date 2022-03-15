@@ -13,7 +13,7 @@
             </div>
             <div class="sidebar-menu">
                 <ul class="menu">
-                    <Menu :MainMenu="MainMenu" :ActiveMenu="ActiveMenu" @add-menu-active="addMenuActive" @add-submenu-active="addSubMenuActive"/>
+                    <Menu :MainMenu="MainMenu" :ActiveMenu="ActiveMenu" @add-menu-active="addMenuActive"/>
                 </ul>
             </div>
             <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
