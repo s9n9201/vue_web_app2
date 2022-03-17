@@ -107,6 +107,7 @@ export default {
         onSubmit(e) {
             e.preventDefault();
             this.Item.itrecId=2;
+            console.log("TEST commit");
             this.addItem(this.Item);
             console.log("TEST");
         },
