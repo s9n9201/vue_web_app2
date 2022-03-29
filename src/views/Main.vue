@@ -1,4 +1,5 @@
 <template>
+    <Sidebar/>
     <div id="main">
         <header class="mb-0">
             <a href="#" class="burger-btn d-block d-xl-none">
@@ -27,10 +28,12 @@
 
 <script>
 //import TheLoader from "@/components/TheLoader";
+import Sidebar from "@/views/Sidebar";
 
 export default {
     name: "Main",
     components: {
+        Sidebar,
     },
 }
 </script>
