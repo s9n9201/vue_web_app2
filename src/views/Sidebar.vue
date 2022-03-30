@@ -26,7 +26,7 @@ import Menu from "../components/Menu"
 import { Sidebar } from "../assets/js/sidebar"
 
 export default {
-    name: "Sidebar",
+    name: "SidebarComponent",
     data() {
         return {
             MainMenu: [],

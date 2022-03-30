@@ -31,7 +31,7 @@
 import Sidebar from "@/views/Sidebar";
 
 export default {
-    name: "Main",
+    name: "MainComponent",
     components: {
         Sidebar,
     },

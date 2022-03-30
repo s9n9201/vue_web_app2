@@ -32,7 +32,7 @@
 
 <script>
 export default {
-    name: "List",
+    name: "ListComponent",
     props: {
         ItemList: {
             type: Array,
