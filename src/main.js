@@ -5,9 +5,10 @@ import store from './store'
 
 import "@/assets/css/bootstrap.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
+import "@/assets/css/pages/auth.css"
 import "@/assets/css/app.css"
 import "bootstrap/dist/js/bootstrap.bundle"
-import "@/assets/css/pages/auth.css"
+
 
 
 createApp(App)
