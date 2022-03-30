@@ -63,7 +63,7 @@ const router=createRouter({
 });
 
 router.beforeEach((to)=>{
-    const publicPage=["login"];
+    const publicPage=["/login"];
     const loggedIn=localStorage.getItem("user");
     let metaTitle="";
     if (to.meta.title) {
@@ -72,7 +72,6 @@ router.beforeEach((to)=>{
     if (window.document.getElementById("headTitle")) {
         window.document.getElementById("headTitle").innerText=metaTitle;
     }
-
     //authentication
     if (!publicPage.includes(to.path) && !loggedIn) {
         return { name: "Login" };
