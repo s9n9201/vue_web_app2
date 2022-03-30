@@ -29,7 +29,7 @@
 //import TheLoader from "@/components/TheLoader";
 
 export default {
-    name: "Main",
+    name: "MainComponent",
     components: {
     },
 }

@@ -73,7 +73,7 @@
 let url="http://localhost:1015/";
 
 export default {
-    name: "Edit",
+    name: "EditComponent",
     data() {
         return {
             Item: {
