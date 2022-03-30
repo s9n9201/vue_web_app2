@@ -1,8 +1,5 @@
-body {
-    background-color: #fff
-}
-
 #auth {
+    background-color: #fff;
     height: 100vh;
     overflow-x: hidden
 }
