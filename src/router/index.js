@@ -63,12 +63,23 @@ const router=createRouter({
 });
 
 router.beforeEach((to)=>{
+    const publicPage=["login"];
+    const loggedIn=localStorage.getItem("user");
     let metaTitle="";
     if (to.meta.title) {
         metaTitle=to.meta.title;
     }
     if (window.document.getElementById("headTitle")) {
         window.document.getElementById("headTitle").innerText=metaTitle;
+    }
+
+    //authentication
+    if (!publicPage.includes(to.path) && !loggedIn) {
+        return { name: "Login" };
+    } else if (to.path=="/login" && loggedIn) {
+        return { name: "Main" };
+    } else {
+        return true;
     }
 });
 
