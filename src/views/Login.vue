@@ -1,7 +1,7 @@
 <template>
     <div id="auth">
         <div class="row h-100">
-            <div class="col-lg-12 col-12">
+<!--            <div class="col-lg-12 col-12">-->
                 <div id="auth-left">
                     <div class="auth-logo">
                         <a href="index.html"><img src="@/assets/images/logo/logo.png" alt="Logo"></a>
@@ -9,15 +9,15 @@
                     <h1 class="auth-title">Log in.</h1>
                     <Form @submit="handleLogin" :validation-schema="schema">
                         <div class="form-group position-relative has-icon-left ">
-                            <Field type="text" class="form-control form-control-xl" name="username" placeholder="Username"/>
+                            <Field type="text" class="form-control form-control-xl" name="orgName" placeholder="帳號"/>
                             <div class="form-control-icon">
                                 <i class="bi bi-person"></i>
                             </div>
                         </div>
-                        <ErrorMessage name="username" class="error-feedback"/>
+                        <ErrorMessage name="orgName" class="error-feedback"/>
                         <div class="mb-4"></div>
                         <div class="form-group position-relative has-icon-left ">
-                            <Field type="password" class="form-control form-control-xl" name="password" placeholder="Password" autocomplete="off"/>
+                            <Field type="password" class="form-control form-control-xl" name="password" placeholder="密碼" autocomplete="off"/>
                             <div class="form-control-icon">
                                 <i class="bi bi-shield-lock"></i>
                             </div>
@@ -41,19 +41,47 @@
                         <p><a class="font-bold" href="">Forgot password?</a>.</p>
                     </div>
                 </div>
-            </div>
-<!--                        <div class="col-lg-7 d-none d-lg-block">-->
-<!--                            <div id="auth-right">-->
-
-<!--                            </div>-->
-<!--                        </div>-->
+<!--            </div>-->
         </div>
     </div>
 </template>
 
 <script>
+import { Form, Field, ErrorMessage } from "vee-validate"
+import * as yup from "yup"
+
 export default {
-    name: "LoginComponent"
+    name: "LoginComponent",
+    components: {
+        Form,
+        Field,
+        ErrorMessage,
+    },
+    data() {
+        const schema=yup.object().shape({
+            orgName: yup.string().required("請輸入您的帳號！"),
+            password: yup.string().required("請輸入您的密碼！"),
+        });
+        return {
+            loading: false,
+            message: "",
+            schema,
+        }
+    },
+    methods: {
+        handleLogin(user) {
+            this.loading=true;
+            this.$store.dispatch("auth/login", user).then(
+                ()=>{
+                    this.$router.push("/");
+                },
+                (error)=>{
+                    this.loading=false;
+                    this.message=(error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+                }
+            );
+        },
+    },
 }
 </script>
 
