@@ -51,6 +51,7 @@
 </template>
 
 <script>
+import authHeader from "@/services/auth-header";
 export default {
     name: "ItemList",
     data() {
@@ -64,7 +65,9 @@ export default {
     },
     methods: {
         async getItems() {
-            return await fetch(`http://localhost:1015/items?page=${this.Page}`)
+            return await fetch(`http://localhost:1015/items?page=${this.Page}`, {
+                                headers: authHeader()
+                            })
                             .then( result=>{
                                 return result.json();
                             });

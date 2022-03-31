@@ -70,7 +70,9 @@ class Sidebar {
         // }
 
         // Scroll into active sidebar
-        setTimeout(() => document.querySelector('.sidebar-item.active').scrollIntoView(false), 100);
+        if (document.querySelector('.sidebar-item').classList.contains("active")) {
+            setTimeout(() => document.querySelector('.sidebar-item.active').scrollIntoView(false), 100);
+        }
 
         // check responsive
         this.onFirstLoad();
