@@ -63,6 +63,7 @@ export default {
     },
     methods: {
         handleLogin(user) {
+            this.message="";
             this.loading=true;
             this.$store.dispatch("auth/login", user).then(
                 ()=>{
