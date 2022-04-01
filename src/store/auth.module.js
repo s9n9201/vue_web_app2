@@ -4,6 +4,8 @@ const initialState=user
     ? { status: { loggedIn: true }, user }
     : { status: { loggedIn: false }, user: null }
 
+initialState.url="http://localhost:1015/";
+
 export const auth={
     namespaced: true,
     state: initialState,
