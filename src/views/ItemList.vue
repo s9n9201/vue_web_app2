@@ -65,7 +65,7 @@ export default {
     },
     methods: {
         async getItems() {
-            return await fetch(`http://localhost:1015/items?page=${this.Page}`, {
+            return await fetch(this.$store.state.auth.url+`items?page=${this.Page}`, {
                                 headers: authHeader()
                             })
                             .then( result=>{

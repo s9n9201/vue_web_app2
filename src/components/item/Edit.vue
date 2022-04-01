@@ -70,8 +70,6 @@
 
 <script>
 
-let url="http://localhost:1015/";
-
 export default {
     name: "EditComponent",
     data() {
@@ -96,7 +94,7 @@ export default {
     },
     methods: {
         async addItem(item) {
-            await fetch(url+"item/insert", {
+            await fetch(this.$store.state.auth.url+"item/insert", {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json",
