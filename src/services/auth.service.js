@@ -1,28 +1,28 @@
-import axios from "axios"
-const API_URL="http://localhost:1015/api/"
+import axiosInstance from "@/services/axios-instance";
+import TokenService from "@/services/token.service";
 
 class AuthService {
     login(user) {
-        return axios
-            .post(API_URL+"signin", {
+        return axiosInstance
+            .post("/api/signin", {
                 orgName: user.orgName,
                 password: user.password
             })
             .then(response=>{
                 if (response.data.Token) {
-                    localStorage.setItem("user", JSON.stringify(response.data));
+                    TokenService.setUser(response.data);
                 }
                 return response.data;
             });
     }
 
     logout() {
-        localStorage.removeItem("user");
+        TokenService.removeUser();
     }
 
     register(user) {
-        return axios
-            .post(API_URL+"signup", {
+        return axiosInstance
+            .post("/api/signup", {
                     orgName: user.orgName,
                     email: user.email,
                     password: user.password,
