@@ -71,8 +71,7 @@ export default {
                     .get(`/items?page=${this.Page}`)
                     .then(
                         response=>{
-                            console.log(response);
-                            return response.json();
+                            return response.data;
                         },
                         error=>{
                             if (error.response && error.response.status===403) {
