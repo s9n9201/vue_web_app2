@@ -51,7 +51,9 @@
 </template>
 
 <script>
-import authHeader from "@/services/auth-header";
+import axiosInstance from "@/services/axios-instance";
+import EventBus from "@/common/EventBus";
+
 export default {
     name: "ItemList",
     data() {
@@ -64,13 +66,20 @@ export default {
         }
     },
     methods: {
-        async getItems() {
-            return await fetch(this.$store.state.auth.url+`items?page=${this.Page}`, {
-                                headers: authHeader()
-                            })
-                            .then( result=>{
-                                return result.json();
-                            });
+        getItems() {
+            return axiosInstance
+                    .get(`/items?page=${this.Page}`)
+                    .then(
+                        response=>{
+                            console.log(response);
+                            return response.json();
+                        },
+                        error=>{
+                            if (error.response && error.response.status===403) {
+                                EventBus.dispatch("logout");
+                            }
+                        }
+                    );
         },
         initData(result) {
             this.Items=result.data;
