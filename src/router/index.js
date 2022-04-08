@@ -47,9 +47,14 @@ const routes=[
                 meta: {
                     title: "商品類別管理",
                 },
+            },
+            {
+                path: "/:NoMatch(.*)*",
+                name: "NotFound",
+                component: ()=>import("@/views/ErrorPage/Page404"),
             }
         ]
-    },
+    }
 ];
 
 const router=createRouter({
