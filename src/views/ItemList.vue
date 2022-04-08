@@ -65,6 +65,11 @@ export default {
             isLoading: false,
         }
     },
+    computed: {
+        routePath() {
+            return this.$route.path;
+        }
+    },
     methods: {
         getItems() {
             return axiosInstance
@@ -93,25 +98,18 @@ export default {
         let result=await this.getItems();
         this.isLoading=false;
         this.initData(result);
-        const unwatch=this.$watch(
-                ()=>this.$route.path,
-                async (to, from )=>{
-                    console.log("to >", to);
-                    console.log("from >", from);
-                    if (to==="/itemlist" && from.indexOf("/itemlist")>-1) {
-                        this.isLoading = true;
-                        let tresult = await this.getItems();
-                        this.isLoading = false;
-                        this.initData(tresult);
-                    }
-                    if (from.indexOf("/itemlist")==-1) {
-                        unwatch();
-                    }
-                });
     },
-    async mounted() {
-        // console.log(this.$route.path);
-        //console.log(await this.getItems());
+    watch: {
+        routePath: async function(to, from) {
+            if (to==="/itemlist" && from.indexOf("/itemlist")>-1) {
+                this.isLoading = true;
+                let rs = await this.getItems();
+                this.isLoading = false;
+                this.initData(rs);
+            }
+        }
+    },
+    mounted() {
     },
     async beforeRouteUpdate(to) {
         if (to.hash!=="#" && to.path==="/itemlist") {   //不等於#，是為了避免第一層點了也觸發。
