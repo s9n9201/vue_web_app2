@@ -1,16 +1,28 @@
 <template>
-<!--    <router-view name="sideBar"></router-view>-->
-<!--    <router-view name="main"></router-view>-->
     <router-view />
 </template>
 
 <script>
+import EventBus from "@/common/EventBus";
+
 export default {
     name: "App",
     components: {
     },
     methods: {
+        logOut() {
+            this.$store.dispatch("auth/logout");
+            this.$router.push("/login");
+        }
     },
+    mounted() {
+        EventBus.on("logout", ()=>{
+            this.logOut();
+        });
+    },
+    beforeUnmount() {
+        EventBus.remove("logout");
+    }
 }
 </script>
 

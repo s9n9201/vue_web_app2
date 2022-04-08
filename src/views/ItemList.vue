@@ -51,7 +51,9 @@
 </template>
 
 <script>
-import authHeader from "@/services/auth-header";
+import axiosInstance from "@/services/axios-instance";
+import EventBus from "@/common/EventBus";
+
 export default {
     name: "ItemList",
     data() {
@@ -64,18 +66,26 @@ export default {
         }
     },
     methods: {
-        async getItems() {
-            return await fetch(this.$store.state.auth.url+`items?page=${this.Page}`, {
-                                headers: authHeader()
-                            })
-                            .then( result=>{
-                                return result.json();
-                            });
+        getItems() {
+            return axiosInstance
+                .get(`/items?page=${this.Page}`)
+                .then(
+                    response=>{
+                        return response.data;
+                    },
+                    error=>{
+                        if (error.response && error.response.status===403) {
+                            EventBus.dispatch("logout");
+                        }
+                    }
+                );
         },
         initData(result) {
-            this.Items=result.data;
-            this.TotalPage=result.totalPage;
-            this.TotalRow=result.dataCount;
+            if (result) {
+                this.Items=result.data;
+                this.TotalPage=result.totalPage;
+                this.TotalRow=result.dataCount;
+            }
         },
     },
     async created() {
@@ -83,17 +93,21 @@ export default {
         let result=await this.getItems();
         this.isLoading=false;
         this.initData(result);
-        this.$watch(
+        const unwatch=this.$watch(
                 ()=>this.$route.path,
-                async (to)=>{
-                    if (to==="/itemlist") {
+                async (to, from )=>{
+                    console.log("to >", to);
+                    console.log("from >", from);
+                    if (to==="/itemlist" && from.indexOf("/itemlist")>-1) {
                         this.isLoading = true;
-                        result = await this.getItems()
+                        let tresult = await this.getItems();
                         this.isLoading = false;
-                        this.initData(result);
+                        this.initData(tresult);
                     }
-                }
-        );
+                    if (from.indexOf("/itemlist")==-1) {
+                        unwatch();
+                    }
+                });
     },
     async mounted() {
         // console.log(this.$route.path);
@@ -110,7 +124,6 @@ export default {
             // this.TotalRow=result.dataCount;
         }
     },
-
 }
 </script>
 
