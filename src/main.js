@@ -12,13 +12,18 @@ import "@/assets/css/app.css"
 import "bootstrap/dist/js/bootstrap.bundle"
 import "sweetalert2/dist/sweetalert2.min.css"
 
+
 setupInterceptors(store);
 
-swal.mixin({
-    showCloseButton: true,
+const Toast=swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 1500,
 })
 
 const app=createApp(App)
+app.config.globalProperties.$Toast=Toast
 app.config.globalProperties.$Swal=swal
 app.use(router)
     .use(store)
