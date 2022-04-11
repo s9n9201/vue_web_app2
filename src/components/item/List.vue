@@ -14,14 +14,14 @@
             </thead>
             <tbody>
                 <tr class="text-center" v-for="Item of ItemList" :key="Item.irecId">
-                    <td class="text-bold-500">{{ Item.irecId }}</td>
+                    <td class="text-bold-500">{{ Item.iname }}</td>
                     <td >{{ Item.isource }}</td>
                     <td class="text-bold-500">{{ Item.iamount }}</td>
                     <td>{{ Item.icost }}</td>
                     <td>{{ Item.iprice }}</td>
                     <td>{{ Item.itotal }}</td>
                     <td>
-                        <router-link :to="'/ItemList/edit/'+Item.irecId">編輯</router-link>
+                        <router-link :to="'/itemlist/edit/'+Item.irecId">編輯</router-link>
                     </td>
 <!--                    <td><a href="#"><i class="badge-circle badge-circle-light-secondary font-medium-1" data-feather="mail"></i></a></td>-->
                 </tr>
