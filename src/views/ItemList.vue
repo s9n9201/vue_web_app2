@@ -15,7 +15,7 @@
                     </div>
                     <transition name="trans-content" mode="out-in">
                         <div id="loading_id" class="d-flex justify-content-center loading" v-if="isLoading">
-                            <img src="../assets/images/loaders/hearts.svg" style="width: 5rem;" alt="audio">
+                            <img src="@/assets/images/loaders/hearts.svg" style="width: 5rem;" alt="audio">
                         </div>
                         <div class="card-content" v-else>
                             <div class="card-body">
