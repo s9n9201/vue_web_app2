@@ -4,48 +4,48 @@
             <div class="col-md-6 col-12">
                 <form class="form form-horizontal" @submit.prevent="onSubmit">
                     <div class="form-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label>商品名稱 {{ IRecId }}</label>
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-md-center">
+                                <label class="form-group">商品名稱</label>
                             </div>
                             <div class="col-md-8 form-group">
                                 <input type="text" name="I_Name" id="I_Name" ref="iname" class="form-control" v-model.trim="Item.iname" @keyup="ItemMsg.iname.val=''">
                                 <div class="error-feedback">{{ ItemMsg.iname.val }}</div>
                             </div>
-                            <div class="col-md-4">
-                                <label>貨源</label>
+                            <div class="col-md-4 text-md-center">
+                                <label class="form-group">貨源</label>
                             </div>
                             <div class="col-md-8 form-group">
                                 <input type="text" name="I_Source" id="I_Source" ref="isource" class="form-control" v-model.trim="Item.isource" @keyup="ItemMsg.isource.val=''">
                                 <div class="error-feedback">{{ ItemMsg.isource.val }}</div>
                             </div>
-                            <div class="col-md-4">
-                                <label>製造地</label>
+                            <div class="col-md-4 text-md-center">
+                                <label class="form-group">製造地</label>
                             </div>
                             <div class="col-md-8 form-group">
                                 <input type="text" name="I_Source" id="I_MadeIn" ref="imadeIn" class="form-control" v-model.trim="Item.imadeIn" @keyup="ItemMsg.imadeIn.val=''">
                                 <div class="error-feedback">{{ ItemMsg.imadeIn.val }}</div>
                             </div>
-                            <div class="col-md-4">
-                                <label>數量</label>
+                            <div class="col-md-4 text-md-center">
+                                <label class="form-group">數量</label>
                             </div>
                             <div class="col-md-8 form-group">
                                 <input type="text" name="I_Amount" id="I_Amount" class="form-control" v-model.trim="Item.iamount">
                             </div>
-                            <div class="col-md-4">
-                                <label>成本</label>
+                            <div class="col-md-4 text-md-center">
+                                <label class="form-group">成本</label>
                             </div>
                             <div class="col-md-8 form-group">
                                 <input type="text" name="I_Cost" id="I_Cost" class="form-control" v-model.trim="Item.icost">
                             </div>
-                            <div class="col-md-4">
-                                <label>定價</label>
+                            <div class="col-md-4 text-md-center">
+                                <label class="form-group">定價</label>
                             </div>
                             <div class="col-md-8 form-group">
                                 <input type="text" name="I_Price" id="I_Price" class="form-control" v-model.trim="Item.iprice">
                             </div>
-                            <div class="col-md-4">
-                                <label>總成本</label>
+                            <div class="col-md-4 text-md-center">
+                                <label class="form-group">總成本</label>
                             </div>
                             <div class="col-md-8 form-group">
 
@@ -132,6 +132,19 @@ export default {
                     }
                 );
         },
+        getItem(I_RecId) {
+            return axiosInstance
+                .get("/items/"+I_RecId)
+                .then(
+                    response=>{
+                        return response.data;
+                    },
+                    error=>{
+                        console.log(error.response);
+                        return error.response;
+                    }
+                );
+        },
         dataCheck() {
             return Object.keys(this.ItemMsg).some((key)=>{
                 if (this.Item[key]=="") {
@@ -162,13 +175,26 @@ export default {
             }
         },
     },
+    async created() {
+        const result=await this.getItem(this.IRecId);
+        console.log(result);
+        if (result?.irecId) {
+            this.Item.irecId=result.irecId;
+            this.Item.iname=result.iname;
+            this.Item.isource=result.isource;
+            this.Item.imadeIn=result.imadeIn;
+            this.Item.iamount=result.iamount;
+            this.Item.icost=result.icost;
+            this.Item.iprice=result.iprice;
+        }
+    }
 }
 </script>
 
 <style scoped>
 .error-feedback {
     color: red;
-    padding: 5px 0px 5px 0px;
+    //padding: 5px 0px 5px 0px;
 }
 
 .btt-loading {
