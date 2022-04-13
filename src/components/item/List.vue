@@ -21,7 +21,7 @@
                     <td>{{ Item.iprice }}</td>
                     <td>{{ Item.itotal }}</td>
                     <td>
-                        <router-link :to="'/itemlist/edit/'+Item.irecId">編輯</router-link>
+                        <router-link :to="'/itemlist/edit/'+Item.irecId" @click="$emit('show-tab', Item.irecId)">編輯</router-link>
                     </td>
 <!--                    <td><a href="#"><i class="badge-circle badge-circle-light-secondary font-medium-1" data-feather="mail"></i></a></td>-->
                 </tr>
