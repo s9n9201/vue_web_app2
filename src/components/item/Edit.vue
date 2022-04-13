@@ -132,6 +132,11 @@ export default {
             type: String,
         }
     },
+    computed: {
+        routerPath() {
+            return this.$route.path;
+        }
+    },
     methods: {
         saveItem(item) {
             let url="/insert";
@@ -192,14 +197,27 @@ export default {
             this.buttonData.disabled=type;
             this.buttonData.val=type?"<img src='../../Spinner.svg' style='width: 32px; heigth: auto;'>":"確認送出";
         },
+        initData(result) {
+            Object.keys(this.Item).forEach((key)=>{
+                let tmpValue;
+                if (key=="irecId") {
+                    tmpValue=null;
+                } else if (key=="iname" || key=="isource" || key=="imadeIn") {
+                    tmpValue="";
+                } else {
+                    tmpValue=0;
+                }
+                this.Item[key]=result?.[key]==undefined?tmpValue:result[key];
+            });
+        },
         async onSubmit() {
             this.buttonDisabled(true);
             if (this.dataCheck()) {
                 this.buttonDisabled(false);
                 return false;
             }
+            console.log(this.Item);
             const result=await this.saveItem(this.Item);
-            console.log(result);
             if (result?.status=="200") {
                 this.$Toast.fire({
                     icon: "success",
@@ -217,25 +235,28 @@ export default {
     },
     async created() {
         if (this.IRecId) {
-            const result=await this.getItem(this.IRecId);
+            let result=await this.getItem(this.IRecId);
             console.log(result);
             if (result?.irecId) {
-                this.Item.irecId=result.irecId;
-                this.Item.itrecId=result.itrecId;
-                this.Item.iname=result.iname;
-                this.Item.isource=result.isource;
-                this.Item.imadeIn=result.imadeIn;
-                this.Item.iamount=result.iamount;
-                this.Item.icost=result.icost;
-                this.Item.iprice=result.iprice;
-                this.Item.itotal=result.itotal;
+                this.initData(result);
             }
         }
-        const ItemTypeResult=await this.getItemType();
+        let ItemTypeResult=await this.getItemType();
         if (ItemTypeResult.length>0) {
             Array.prototype.push.apply(this.ItemType, ItemTypeResult);
         }
-
+    },
+    watch: {
+        routerPath: async function(to) {
+            let tmpIRecId=this.$route.params.id;
+            if (to==="/itemlist/edit" || to==="/itemlist/edit/"+tmpIRecId) {
+                let result={};
+                if (to==="/itemlist/edit/"+tmpIRecId) {
+                    result=await this.getItem(tmpIRecId);
+                }
+                this.initData(result);
+            }
+        },
     }
 }
 </script>
