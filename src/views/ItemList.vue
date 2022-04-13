@@ -11,6 +11,9 @@
                             <li class="nav-item" role="presentation">
                                 <router-link to="/itemlist/edit" class="nav-link" id="profile-tab" >新增商品</router-link>
                             </li>
+                            <li class="nav-item" role="presentation" v-if="ItemEditRecId.isShowTab">
+                                <router-link :to="'/itemlist/edit/'+ItemEditRecId.RecId" :class="`nav-link`" id="profile-tab-edit" >編輯商品</router-link>
+                            </li>
                         </ul>
                     </div>
                     <transition name="trans-content" mode="out-in">
@@ -19,7 +22,7 @@
                         </div>
                         <div class="card-content" v-else>
                             <div class="card-body">
-                                <router-view :ItemList="Items"></router-view>
+                                <router-view :ItemList="Items" @show-tab="showTab"></router-view>
                             </div>
                             <div class="div-pagination" v-if="this.$route.path=='/itemlist'">
                                 <nav aria-label="Page navigation example">
@@ -63,6 +66,10 @@ export default {
             TotalPage: 1,
             TotalRow: 0,
             isLoading: false,
+            ItemEditRecId: {
+                RecId: 0,
+                isShowTab: false,
+            },
         }
     },
     computed: {
@@ -92,6 +99,10 @@ export default {
                 this.TotalRow=result.dataCount;
             }
         },
+        showTab(I_RecId) {
+            this.ItemEditRecId.isShowTab=I_RecId===0?false:true;
+            this.ItemEditRecId.RecId=I_RecId;
+        },
     },
     async created() {
         this.isLoading=true;
@@ -103,9 +114,10 @@ export default {
         routePath: async function(to, from) {
             if (to==="/itemlist" && from.indexOf("/itemlist")>-1) {
                 this.isLoading = true;
+                this.showTab(0);
                 let rs = await this.getItems();
-                this.isLoading = false;
                 this.initData(rs);
+                this.isLoading = false;
             }
         }
     },
@@ -126,6 +138,7 @@ export default {
 </script>
 
 <style scoped>
+/*因為看起來沒有用到，先註解掉*/
 .router-link-exact-active {
     border: none;
     color: #435ebe;
@@ -134,7 +147,8 @@ export default {
 .router-link-exact-active {
     background-color: #f2f7ff !important;
     border-color: #dee2e6 #dee2e6 #f2f7ff;
-    color: #495057
+    color: #495057;
+    position: relative;
 }
 .router-link-exact-active:after {
     background-color: #435ebe;
