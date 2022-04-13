@@ -13,6 +13,15 @@
                                 <div class="error-feedback">{{ ItemMsg.iname.val }}</div>
                             </div>
                             <div class="col-md-4 text-md-center">
+                                <label class="form-group">商品類型</label>
+                            </div>
+                            <div class="col-md-8 form-group">
+                                <select class="form-select" name="I_TRecId" id="I_TRecId" ref="itrecId" v-model="Item.itrecId" @mousedown="ItemMsg.itrecId.val=''">
+                                    <option v-for="type of ItemType" :value="type.trecId" :key="type.trecId">{{ type.tname }}</option>
+                                </select>
+                                <div class="error-feedback">{{ ItemMsg.itrecId.val }}</div>
+                            </div>
+                            <div class="col-md-4 text-md-center">
                                 <label class="form-group">貨源</label>
                             </div>
                             <div class="col-md-8 form-group">
@@ -48,7 +57,7 @@
                                 <label class="form-group">總成本</label>
                             </div>
                             <div class="col-md-8 form-group">
-
+                                {{ Item.itotal }}
                             </div>
 <!--                            <div class="col-12 col-md-8 offset-md-4 form-group">-->
 <!--                                <div class='form-check'>-->
@@ -84,7 +93,7 @@ export default {
         return {
             Item: {
                 irecId: null,
-                itrecId: null,
+                itrecId: 0,
                 iname: "",
                 isource: "",
                 imadeIn: "",
@@ -93,10 +102,15 @@ export default {
                 iprice: 0,
                 itotal: 0,
             },
+            ItemType: [{tname: "請選擇..", tsubName: "", trecId: 0},],
             ItemMsg: {
                 iname: {
                     val: "",
                     default: "請輸入商品名稱！",
+                },
+                itrecId: {
+                    val: "",
+                    default: "請選擇商品類型！",
                 },
                 isource: {
                     val: "",
@@ -119,15 +133,18 @@ export default {
         }
     },
     methods: {
-        addItem(item) {
+        saveItem(item) {
+            let url="/insert";
+            if (this.Item.irecId!==null) {
+                url="/update";
+            }
             return axiosInstance
-                .post("/item/insert", item)
+                .post("/item"+url, item)
                 .then(
                     response=>{
                         return response.data;
                     },
                     error=>{
-                        console.log(error.response);
                         return error.response;
                     }
                 );
@@ -140,14 +157,31 @@ export default {
                         return response.data;
                     },
                     error=>{
-                        console.log(error.response);
+                        return error.response;
+                    }
+                );
+        },
+        getItemType() {
+            return axiosInstance
+                .get("/itemtypes")
+                .then(
+                    response=>{
+                        return response.data;
+                    },
+                    error=>{
                         return error.response;
                     }
                 );
         },
         dataCheck() {
             return Object.keys(this.ItemMsg).some((key)=>{
+                let NoData=false;
                 if (this.Item[key]=="") {
+                    NoData=true;
+                } else if (key=="itrecId" && this.Item[key]===0) {
+                    NoData=true;
+                }
+                if (NoData) {
                     this.ItemMsg[key].val=this.ItemMsg[key].default;
                     this.$refs[key].focus();
                     return true;
@@ -156,7 +190,7 @@ export default {
         },
         buttonDisabled(type) {
             this.buttonData.disabled=type;
-            this.buttonData.val=type?"<img src='../Spinner.svg' style='width: 32px; heigth: auto;'>":"確認送出";
+            this.buttonData.val=type?"<img src='../../Spinner.svg' style='width: 32px; heigth: auto;'>":"確認送出";
         },
         async onSubmit() {
             this.buttonDisabled(true);
@@ -164,29 +198,44 @@ export default {
                 this.buttonDisabled(false);
                 return false;
             }
-            const result=await this.addItem(this.Item);
-            if (result.status=="200") {
+            const result=await this.saveItem(this.Item);
+            console.log(result);
+            if (result?.status=="200") {
                 this.$Toast.fire({
                     icon: "success",
                     title: result.message,
                 });
-                this.buttonDisabled(true);
                 this.$router.push("/itemlist");
+            } else if (result.status==500){
+                this.$Toast.fire({
+                    icon: "error",
+                    title: "新增失敗，請重新操作",
+                });
             }
+            this.buttonDisabled(false);
         },
     },
     async created() {
-        const result=await this.getItem(this.IRecId);
-        console.log(result);
-        if (result?.irecId) {
-            this.Item.irecId=result.irecId;
-            this.Item.iname=result.iname;
-            this.Item.isource=result.isource;
-            this.Item.imadeIn=result.imadeIn;
-            this.Item.iamount=result.iamount;
-            this.Item.icost=result.icost;
-            this.Item.iprice=result.iprice;
+        if (this.IRecId) {
+            const result=await this.getItem(this.IRecId);
+            console.log(result);
+            if (result?.irecId) {
+                this.Item.irecId=result.irecId;
+                this.Item.itrecId=result.itrecId;
+                this.Item.iname=result.iname;
+                this.Item.isource=result.isource;
+                this.Item.imadeIn=result.imadeIn;
+                this.Item.iamount=result.iamount;
+                this.Item.icost=result.icost;
+                this.Item.iprice=result.iprice;
+                this.Item.itotal=result.itotal;
+            }
         }
+        const ItemTypeResult=await this.getItemType();
+        if (ItemTypeResult.length>0) {
+            Array.prototype.push.apply(this.ItemType, ItemTypeResult);
+        }
+
     }
 }
 </script>
