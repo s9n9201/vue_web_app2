@@ -6,7 +6,7 @@
                     <div class="card-header">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <router-link to="/itemlist" class="nav-link" id="home-tab">商品列表</router-link>
+                                <router-link :to="'/itemlist?p='+Page" class="nav-link" id="home-tab">商品列表</router-link>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <router-link to="/itemlist/edit" class="nav-link" id="profile-tab" >新增商品</router-link>
@@ -16,37 +16,49 @@
                             </li>
                         </ul>
                     </div>
-                    <transition name="trans-content" mode="out-in">
-                        <div id="loading_id" class="d-flex justify-content-center loading" v-if="isLoading">
-                            <img src="@/assets/images/loaders/hearts.svg" style="width: 5rem;" alt="audio">
+                    <div class="content-top " v-if="this.$route.path=='/itemlist'">
+                        <div>
+                            <label>{{ TotalRow }}&nbsp;件商品庫存</label>
                         </div>
-                        <div class="card-content" v-else>
-                            <div class="card-body">
+                        <div><input type="text" class="dataTable-input"></div>
+                    </div>
+                    <div class="card-content">
+                        <transition name="trans-content" mode="out-in">
+                            <div id="loading_id" class="d-flex justify-content-center loading" v-if="isLoading">
+                                <img src="@/assets/images/loaders/hearts.svg" style="width: 5rem;" alt="audio">
+                            </div>
+                            <div class="card-body pt-0" v-else>
                                 <router-view :ItemList="Items" @show-tab="showTab"></router-view>
                             </div>
-                            <div class="div-pagination" v-if="this.$route.path=='/itemlist'">
-                                <nav aria-label="Page navigation example">
-                                    <ul class="pagination pagination-primary justify-content-end">
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">
-                                                <span aria-hidden="true"><i class="bi bi-chevron-left"></i></span>
-                                            </a>
-                                        </li>
-                                        <li class="page-item" :class="{ active: pageItem==Page }" v-for="pageItem of TotalPage" :key="pageItem">
-                                            <a class="page-link" href="#">
-                                                {{ pageItem }}
-                                            </a>
-                                        </li>
-                                        <li class="page-item" >
-                                            <a class="page-link" href="#">
-                                                <span aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
-                        </div>
-                    </transition>
+                        </transition>
+                    </div>
+                    <div class="div-pagination" v-if="this.$route.path=='/itemlist'">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination pagination-primary justify-content-end">
+                                <router-link :to="'itemlist?p=1'" custom v-slot="{ href, navigate}">
+                                    <li class="page-item">
+                                        <a class="page-link" :href="href" @click="navigate">
+                                            <span aria-hidden="true"><i class="bi bi-chevron-left"></i><i class="bi bi-chevron-left"></i></span>
+                                        </a>
+                                    </li>
+                                </router-link>
+                                <router-link :to="'/itemlist?p='+pageItem" custom v-slot="{ href, navigate, isActive }" v-for="pageItem of TotalPage" :key="pageItem" >
+                                    <li class="page-item" :class="{ active: isActive && pageItem==Page }" v-show="showPage(pageItem)">
+                                        <a :href="href" class="page-link" @click="navigate">
+                                            {{ pageItem }}
+                                        </a>
+                                    </li>
+                                </router-link>
+                                <router-link :to="'itemlist?p='+TotalPage" custom v-slot="{ href, navigate }">
+                                    <li class="page-item">
+                                        <a class="page-link" :href="href" @click="navigate">
+                                            <span aria-hidden="true"><i class="bi bi-chevron-right"></i><i class="bi bi-chevron-right"></i></span>
+                                        </a>
+                                    </li>
+                                </router-link>
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
             </div>
         </div>
@@ -73,8 +85,11 @@ export default {
         }
     },
     computed: {
-        routePath() {
-            return this.$route.path;
+        watchObjet() {
+            return {
+                Path: this.$route.path,
+                Query: this.$route.query.p,
+            }
         }
     },
     methods: {
@@ -103,17 +118,41 @@ export default {
             this.ItemEditRecId.isShowTab=I_RecId===0?false:true;
             this.ItemEditRecId.RecId=I_RecId;
         },
+        showPage(pageItem) {
+            if (this.Page<3 && pageItem<6) {
+                return true;
+            }
+            if (this.TotalPage-this.Page==1 && pageItem>this.Page-4) {
+                return true;
+            }
+            if (this.TotalPage==this.Page && pageItem>this.Page-5) {
+                return true;
+            }
+            if ((this.Page+2)>=pageItem && (this.Page-2)<=pageItem) {
+                return true;
+            }
+            return false;
+        },
+        setQueryPage() {
+            if (isNaN(parseInt(this.$route.query.p))) {
+                this.Page=1;
+            } else {
+                this.Page=parseInt(this.$route.query.p);
+            }
+        }
     },
     async created() {
         this.isLoading=true;
+        this.setQueryPage();
         let result=await this.getItems();
         this.isLoading=false;
         this.initData(result);
     },
     watch: {
-        routePath: async function(to, from) {
-            if (to==="/itemlist" && from.indexOf("/itemlist")>-1) {
+        watchObjet: async function(newObject, oldObejct) {
+            if (newObject.Path==="/itemlist" && oldObejct.Path.indexOf("/itemlist")>-1) {
                 this.isLoading = true;
+                this.setQueryPage();
                 this.showTab(0);
                 let rs = await this.getItems();
                 this.initData(rs);
@@ -124,6 +163,7 @@ export default {
     mounted() {
     },
     async beforeRouteUpdate(to) {
+        console.log("Before Router");
         if (to.hash!=="#" && to.path==="/itemlist") {   //不等於#，是為了避免第一層點了也觸發。
             //如果用這個來換頁的話，會導致我點了商品列表的頁籤，頁籤還沒上active，就開始reload，reload完才出現active，若要排除此狀況，可能要把取資料的function做在list。
             // this.isLoading=true;
@@ -175,4 +215,11 @@ export default {
 .trans-content-enter-from, .v-leave-to {
     opacity: 0;
 }
+.content-top {
+    padding: 0rem 1.5rem 0rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 </style>
