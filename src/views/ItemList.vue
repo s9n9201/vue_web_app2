@@ -20,7 +20,14 @@
                         <div>
                             <label>{{ TotalRow }}&nbsp;件商品庫存</label>
                         </div>
-                        <div><input type="text" class="dataTable-input"></div>
+                        <div>
+                            <input type="text" name="SearchText"
+                                   id="SearchText"
+                                   class="dataTable-input"
+                                   placeholder="Search..."
+                                   v-model="SearchText"
+                                   @keydown.enter="setQuerySearchText">
+                        </div>
                     </div>
                     <div class="card-content">
                         <transition name="trans-content" mode="out-in">
@@ -75,6 +82,7 @@ export default {
         return {
             Items: [],
             Page: 1,
+            SearchText: "",
             TotalPage: 1,
             TotalRow: 0,
             isLoading: false,
@@ -88,14 +96,14 @@ export default {
         watchObjet() {
             return {
                 Path: this.$route.path,
-                Query: this.$route.query.p,
+                //Query: this.$route.query.p,
             }
         }
     },
     methods: {
         getItems() {
             return axiosInstance
-                .get(`/items?page=${this.Page}`)
+                .get(`/items?page=${this.Page}&search=${this.SearchText}`)
                 .then(
                     response=>{
                         return response.data;
@@ -133,17 +141,22 @@ export default {
             }
             return false;
         },
-        setQueryPage() {
-            if (isNaN(parseInt(this.$route.query.p))) {
-                this.Page=1;
-            } else {
+        setQueryData() {
+            if (!isNaN(parseInt(this.$route.query.p))) {
                 this.Page=parseInt(this.$route.query.p);
             }
+            if (this.$route.query.search!==undefined) {
+                this.SearchText=this.$route.query.search;
+            }
+        },
+        setQuerySearchText() {
+            this.Page=1;
+            this.$router.push(`/itemlist?p=${this.Page}&search=${this.SearchText}`);
         }
     },
     async created() {
         this.isLoading=true;
-        this.setQueryPage();
+        this.setQueryData();
         let result=await this.getItems();
         this.isLoading=false;
         this.initData(result);
@@ -152,7 +165,7 @@ export default {
         watchObjet: async function(newObject, oldObejct) {
             if (newObject.Path==="/itemlist" && oldObejct.Path.indexOf("/itemlist")>-1) {
                 this.isLoading = true;
-                this.setQueryPage();
+                this.setQueryData();
                 this.showTab(0);
                 let rs = await this.getItems();
                 this.initData(rs);
