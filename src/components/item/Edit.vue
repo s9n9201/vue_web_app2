@@ -234,7 +234,6 @@ export default {
                     icon: "success",
                     title: result.message,
                 });
-                console.log("Parameter > ", this.UrlParameter);
                 this.$router.push( "/itemlist"+this.getUrlParameter() );
             } else if (result.status==500){
                 this.$Toast.fire({
