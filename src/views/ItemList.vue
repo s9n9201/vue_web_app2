@@ -6,7 +6,7 @@
                     <div class="card-header">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <router-link :to="'/itemlist?p='+Page" class="nav-link" id="home-tab">商品列表</router-link>
+                                <router-link :to="'/itemlist'+this.getUrlParameter()" class="nav-link" id="home-tab">商品列表</router-link>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <router-link to="/itemlist/edit" class="nav-link" id="profile-tab" >新增商品</router-link>
@@ -35,28 +35,28 @@
                                 <img src="@/assets/images/loaders/hearts.svg" style="width: 5rem;" alt="audio">
                             </div>
                             <div class="card-body pt-0" v-else>
-                                <router-view :ItemList="Items" @show-tab="showTab"></router-view>
+                                <router-view :ItemList="Items" :UrlParameter="getUrlParameter()" @show-tab="showTab"></router-view>
                             </div>
                         </transition>
                     </div>
                     <div class="div-pagination" v-if="this.$route.path=='/itemlist'">
                         <nav aria-label="Page navigation example">
                             <ul class="pagination pagination-primary justify-content-end">
-                                <router-link :to="'itemlist?p=1'" custom v-slot="{ href, navigate}">
+                                <router-link :to="'itemlist'+this.getUrlParameter(1)" custom v-slot="{ href, navigate}">
                                     <li class="page-item">
                                         <a class="page-link" :href="href" @click="navigate">
                                             <span aria-hidden="true"><i class="bi bi-chevron-left"></i><i class="bi bi-chevron-left"></i></span>
                                         </a>
                                     </li>
                                 </router-link>
-                                <router-link :to="'/itemlist?p='+pageItem" custom v-slot="{ href, navigate, isActive }" v-for="pageItem of TotalPage" :key="pageItem" >
+                                <router-link :to="'/itemlist'+this.getUrlParameter(pageItem)" custom v-slot="{ href, navigate, isActive }" v-for="pageItem of TotalPage" :key="pageItem" >
                                     <li class="page-item" :class="{ active: isActive && pageItem==Page }" v-show="showPage(pageItem)">
                                         <a :href="href" class="page-link" @click="navigate">
                                             {{ pageItem }}
                                         </a>
                                     </li>
                                 </router-link>
-                                <router-link :to="'itemlist?p='+TotalPage" custom v-slot="{ href, navigate }">
+                                <router-link :to="'itemlist'+this.getUrlParameter(TotalPage)" custom v-slot="{ href, navigate }">
                                     <li class="page-item">
                                         <a class="page-link" :href="href" @click="navigate">
                                             <span aria-hidden="true"><i class="bi bi-chevron-right"></i><i class="bi bi-chevron-right"></i></span>
@@ -98,7 +98,7 @@ export default {
                 Path: this.$route.path,
                 //Query: this.$route.query.p,
             }
-        }
+        },
     },
     methods: {
         getItems() {
@@ -144,14 +144,21 @@ export default {
         setQueryData() {
             if (!isNaN(parseInt(this.$route.query.p))) {
                 this.Page=parseInt(this.$route.query.p);
+            } else {
+                this.Page=1;
             }
             if (this.$route.query.search!==undefined) {
                 this.SearchText=this.$route.query.search;
+            } else {
+                this.SearchText="";
             }
         },
         setQuerySearchText() {
             this.Page=1;
             this.$router.push(`/itemlist?p=${this.Page}&search=${this.SearchText}`);
+        },
+        getUrlParameter(page=this.Page) {
+            return "?p="+page+(this.SearchText==""?"":"&search="+this.SearchText);
         }
     },
     async created() {
@@ -176,7 +183,6 @@ export default {
     mounted() {
     },
     async beforeRouteUpdate(to) {
-        console.log("Before Router");
         if (to.hash!=="#" && to.path==="/itemlist") {   //不等於#，是為了避免第一層點了也觸發。
             //如果用這個來換頁的話，會導致我點了商品列表的頁籤，頁籤還沒上active，就開始reload，reload完才出現active，若要排除此狀況，可能要把取資料的function做在list。
             // this.isLoading=true;
