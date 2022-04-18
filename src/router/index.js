@@ -36,6 +36,8 @@ const routes=[
                         component: ()=>import("../components/item/Edit"),
                         props: route=>({
                             IRecId: route.params.id,
+                            Page: route.query.p,
+                            SearchText: route.query.search,
                         }),
                     },
                 ]
