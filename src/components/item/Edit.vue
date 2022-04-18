@@ -130,7 +130,13 @@ export default {
     props: {
         IRecId: {
             type: String,
-        }
+        },
+        Page: {
+            type: Number,
+        },
+        SearchText: {
+            type: String,
+        },
     },
     computed: {
         routerPath() {
@@ -210,20 +216,26 @@ export default {
                 this.Item[key]=result?.[key]==undefined?tmpValue:result[key];
             });
         },
+        getUrlParameter() {
+            if (this.Item.irecId!=null) {
+                return "?p="+this.Page+(this.SearchText!=undefined?"&search="+this.SearchText:"");
+            }
+            return "";
+        },
         async onSubmit() {
             this.buttonDisabled(true);
             if (this.dataCheck()) {
                 this.buttonDisabled(false);
                 return false;
             }
-            console.log(this.Item);
             const result=await this.saveItem(this.Item);
             if (result?.status=="200") {
                 this.$Toast.fire({
                     icon: "success",
                     title: result.message,
                 });
-                this.$router.push("/itemlist");
+                console.log("Parameter > ", this.UrlParameter);
+                this.$router.push( "/itemlist"+this.getUrlParameter() );
             } else if (result.status==500){
                 this.$Toast.fire({
                     icon: "error",
