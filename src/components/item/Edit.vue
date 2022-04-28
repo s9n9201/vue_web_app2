@@ -5,6 +5,7 @@
                 <form class="form form-horizontal" @submit.prevent="onSubmit">
                     <div class="form-body">
                         <div class="row align-items-center">
+                            <UploadFile />
                             <div class="col-md-4 text-md-center">
                                 <label class="form-group">商品名稱</label>
                             </div>
@@ -86,6 +87,7 @@
 </template>
 <script>
 import axiosInstance from "@/services/axios-instance";
+import UploadFile from "@/components/UploadFile";
 
 export default {
     name: "EditComponent",
@@ -137,6 +139,9 @@ export default {
         SearchText: {
             type: String,
         },
+    },
+    components: {
+        UploadFile,
     },
     computed: {
         routerPath() {
