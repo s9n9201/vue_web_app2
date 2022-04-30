@@ -1,7 +1,7 @@
 import axiosInstance from "@/services/axios-instance";
 
 class UploadFileService {
-    upload(Module, UUID, file, onUploadProgress) {
+    upload(Module, UUID, file) {    //, onUploadProgress。第四個參數用來控制Progress bar的，先註解
         let formData=new FormData();
         for (var i=0; i<file.length; i++) {
             formData.append("files", file[i]);
@@ -12,7 +12,7 @@ class UploadFileService {
             headers: {
                 "Content-type": "multipart/form-data"
             },
-            onUploadProgress
+            //onUploadProgress
         });
     }
 
