@@ -123,7 +123,7 @@ export default {
             }
         },
         showTab(I_RecId) {
-            this.ItemEditRecId.isShowTab=I_RecId===0?false:true;
+            this.ItemEditRecId.isShowTab=I_RecId===0?false:true;    //使用0是為了區分在列表還是在Edit頁面的新增商品或編輯商品
             this.ItemEditRecId.RecId=I_RecId;
         },
         showPage(pageItem) {
