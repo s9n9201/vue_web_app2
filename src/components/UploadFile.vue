@@ -1,19 +1,22 @@
 <template>
-<!--    <div><input type="file" multiple></div>-->
-    <div class="images">
-<!--        <div class="img">eit</div>-->
-        <div class="img" v-for="(img, i) in previewImage" :key="'previewImage-'+i"><img :src="img" style="width: 100%; height: 100%;"></div>
-        <div class="pic" id="picUploadButton" ref="picUploadButton">
-            add
+    <div class="file-area">
+        <div class="file-block" v-for="(img, i) in previewImage" :key="'previewImage-'+i">
+            <img :src="img" style="width: 100%; height: 100%;">
+            <div class="btn-block">
+                <div class="btn-block-item" @click="remove(img)"><span><i class="bi bi-trash"></i></span></div>
+            </div>
+        </div>
+        <div class="btn-upload" ref="picUploadButton">
+            <span>UPLOAD</span>
         </div>
     </div>
     <div class="file-area">
         <div class="file-block" v-for="(img, i) in ImageList" :key="'ImageList-'+i">
             <img :src="img.url" :alt="img.fileName" style="width: 100%; height: 100%;">
             <div class="btn-block">
-                <div class="btn-block-item" style="border-right: solid 2px" onclick="alert('TEST');"><span><i class="bi bi-zoom-in"></i></span></div>
-                <div class="btn-block-item"><span><i class="bi bi-download"></i></span></div>
-                <div class="btn-block-item" style="border-left: solid 2px"><span><i class="bi bi-trash"></i></span></div>
+                <div class="btn-block-item" style="border-right: solid 2px"><span><i class="bi bi-zoom-in"></i></span></div>
+                <div class="btn-block-item" @click="download(img.url)"><span><i class="bi bi-download"></i></span></div>
+                <div class="btn-block-item" style="border-left: solid 2px" @click="deleteFile(img)"><span><i class="bi bi-trash"></i></span></div>
             </div>
         </div>
     </div>
@@ -52,6 +55,9 @@ export default {
                         return response;
                     });
         },
+        download(url) {
+            document.location.href=url;
+        },
         setUpload() {
             let button=this.$refs.picUploadButton;
             let fileElement=document.createElement("input");
@@ -71,6 +77,35 @@ export default {
                 this.previewImage.push(URL.createObjectURL(uploadFileList[i]));
                 this.uploadFileList.push(uploadFileList[i]);
             }
+        },
+        async deleteFile(dataObject) {
+            if (await this.showDelComfirm()) {  //難怪在這個then裡面放await會不行，因為他本身也是一個promise。
+                let uuid=dataObject.url.split("/")[4];
+                const result=await uploadFileService.deleteFile(uuid)
+                        .then((response)=>{
+                            return response.data;
+                        },(error)=>{
+                            return error.response.data;
+                        });
+                if (result?.status===200) {
+                    this.ImageList=this.ImageList.filter((obj)=>{
+                        return obj!==dataObject;
+                    });
+                }
+            }
+        },
+        remove(dataObject) {
+            this.previewImage=this.previewImage.filter((obj)=>{
+                return obj!==dataObject;
+            });
+        },
+        showDelComfirm() {
+            return this.$SwalConfirm.fire({
+                width: 320,
+                title: "是否刪除檔案？",
+                confirmButtonText: "刪除",
+                cancelButtonText: "取消",
+            }).then(result=>result.isConfirmed);
         }
     },
     created() {
@@ -97,7 +132,6 @@ export default {
     margin: 0px 10px 10px 0px;
     border-radius: 5px;
     display: flex;
-    cursor: pointer;    /*變為手指*/
     position: relative;
     overflow: hidden;   /*內容超出後會修整，這樣圖片才會有border-redius屬性*/
 }
@@ -114,6 +148,7 @@ export default {
 }
 .file-block:hover .btn-block {
     opacity: 0.6;
+    cursor: pointer;    /*變為手指*/
 }
 .btn-block-item {
     display: flex;
@@ -124,60 +159,16 @@ export default {
 .btn-block-item:hover .bi-zoom-in, .btn-block-item:hover .bi-download, .btn-block-item:hover .bi-trash {
     color: white;
 }
-.images {
+.btn-upload {
     display: flex;
-    flex-wrap:  wrap;
-    margin-top: 20px;
-}
-.images .img, .images .pic {
-    flex-basis: 23%;
-    margin-bottom: 10px;
-    border-radius: 4px;
-}
-.images .img {
-    /*width: 112px;*/
-    height: 93px;
-    background-size: cover;
-    margin-right: 10px;
-    background-position: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-.images .img span {
-    display: none;
-    text-transform: capitalize;
-    z-index: 5;
-}
-.images .img::after {
-    content: '';
-    width: 100%;
-    height: 100%;
-    transition: opacity .1s ease-in;
-    border-radius: 4px;
-    opacity: 0;
-    position: absolute;
-}
-.images .img:hover::after {
-    display: block;
-    background-color: #000;
-    opacity: .5;
-}
-.images .img:hover span {
-    display: block;
-    color: #fff;
-}
-.images .pic {
+    width: 150px;
+    height: 150px;
+    margin: 0px 10px 10px 0px;
     background-color: #F5F7FA;
-    align-self: center;
-    text-align: center;
-    padding: 40px 0;
-    text-transform: uppercase;
+    justify-content: center;
+    align-items: center;
     color: #848EA1;
-    font-size: 14px;
+    font-size: 16px;
     cursor: pointer;
 }
 </style>
