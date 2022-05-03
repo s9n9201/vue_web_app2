@@ -5,7 +5,7 @@
                 <form class="form form-horizontal" @submit.prevent="onSubmit">
                     <div class="form-body">
                         <div class="row align-items-center">
-                            <UploadFile />
+                            <UploadFile ref="fileComponent"/>
                             <div class="col-md-4 text-md-center">
                                 <label class="form-group">商品名稱</label>
                             </div>
@@ -95,6 +95,7 @@ export default {
         return {
             Item: {
                 irecId: null,
+                iuuid: "",
                 itrecId: 0,
                 iname: "",
                 isource: "",
@@ -213,7 +214,7 @@ export default {
                 let tmpValue;
                 if (key=="irecId") {
                     tmpValue=null;
-                } else if (key=="iname" || key=="isource" || key=="imadeIn") {
+                } else if (key=="iname" || key=="isource" || key=="imadeIn" || key =="iuuid") {
                     tmpValue="";
                 } else {
                     tmpValue=0;
@@ -234,10 +235,19 @@ export default {
                 return false;
             }
             const result=await this.saveItem(this.Item);
-            if (result?.status=="200") {
+            if (result?.status==200) {
+                let fileResult="";
+                console.log("新增/儲存資料 > ", result);
+                if (result?.uuid!=="" && result?.uuid!==null) {
+                    fileResult=await this.$refs.fileComponent.upload("Item", result.uuid);
+                    console.log("儲存檔案 > ", fileResult);
+                    if (fileResult?.message!==undefined && fileResult?.message!=="" ) {
+                        fileResult=" ( "+fileResult.message+" )";
+                    }
+                }
                 this.$Toast.fire({
                     icon: "success",
-                    title: result.message,
+                    title: result.message+fileResult,
                 });
                 this.$router.push( "/itemlist"+this.getUrlParameter() );
             } else if (result.status==500){
@@ -252,14 +262,20 @@ export default {
     async created() {
         if (this.IRecId) {
             let result=await this.getItem(this.IRecId);
-            console.log(result);
             if (result?.irecId) {
                 this.initData(result);
+                this.$emit('show-tab', this.Item.irecId);   //顯示Tab及active
             }
         }
         let ItemTypeResult=await this.getItemType();
         if (ItemTypeResult.length>0) {
             Array.prototype.push.apply(this.ItemType, ItemTypeResult);
+        }
+        if (this.Item.iuuid!=="") {
+            let fileResult=await this.$refs.fileComponent.getFile("Item", this.Item.iuuid);
+            if (fileResult.status===200) {
+                this.$refs.fileComponent.ImageList=fileResult.data;
+            }
         }
     },
     watch: {
