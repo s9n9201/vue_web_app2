@@ -258,35 +258,37 @@ export default {
             }
             this.buttonDisabled(false);
         },
+        async getItemObject(type, recId) {
+            let result={};
+            let fileReulst=[];
+            if (recId!=undefined) {
+                result=await this.getItem(recId);
+                if (result?.iuuid!=="" && result?.iuuid!=undefined) {
+                    let tmpFileResult=await this.$refs.fileComponent.getFile("Item", result.iuuid);
+                    if (tmpFileResult.status===200) {
+                        fileReulst=tmpFileResult.data;
+                    }
+                }
+                this.$emit('show-tab', recId);
+            }
+            if (type==="create") {
+                let ItemTypeResult=await this.getItemType();
+                if (ItemTypeResult.length>0) {
+                    Array.prototype.push.apply(this.ItemType, ItemTypeResult);
+                }
+            }
+            this.initData(result);
+            this.$refs.fileComponent.ImageList=fileReulst;
+        },
     },
     async created() {
-        if (this.IRecId) {
-            let result=await this.getItem(this.IRecId);
-            if (result?.irecId) {
-                this.initData(result);
-                this.$emit('show-tab', this.Item.irecId);   //顯示Tab及active
-            }
-        }
-        let ItemTypeResult=await this.getItemType();
-        if (ItemTypeResult.length>0) {
-            Array.prototype.push.apply(this.ItemType, ItemTypeResult);
-        }
-        if (this.Item.iuuid!=="") {
-            let fileResult=await this.$refs.fileComponent.getFile("Item", this.Item.iuuid);
-            if (fileResult.status===200) {
-                this.$refs.fileComponent.ImageList=fileResult.data;
-            }
-        }
+        this.getItemObject("create", this.IRecId);
     },
     watch: {
         routerPath: async function(to) {
             let tmpIRecId=this.$route.params.id;
             if (to==="/itemlist/edit" || to==="/itemlist/edit/"+tmpIRecId) {
-                let result={};
-                if (to==="/itemlist/edit/"+tmpIRecId) {
-                    result=await this.getItem(tmpIRecId);
-                }
-                this.initData(result);
+                this.getItemObject("watch", tmpIRecId);
             }
         },
     }
