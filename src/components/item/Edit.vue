@@ -263,12 +263,6 @@ export default {
             let fileReulst=[];
             if (recId!=undefined) {
                 result=await this.getItem(recId);
-                if (result?.iuuid!=="" && result?.iuuid!=undefined) {
-                    let tmpFileResult=await this.$refs.fileComponent.getFile("Item", result.iuuid);
-                    if (tmpFileResult.status===200) {
-                        fileReulst=tmpFileResult.data;
-                    }
-                }
                 this.$emit('show-tab', recId);
             }
             if (type==="create") {
@@ -278,6 +272,13 @@ export default {
                 }
             }
             this.initData(result);
+            //檔案本來在上面區塊，拉到下面，是為了避免取檔案時出錯，導致下面script一起出錯，而沒顯示出物品資料。
+            if (this.Item.iuuid!=="") {
+                let tmpFileResult=await this.$refs.fileComponent.getFile("Item", this.Item.iuuid);
+                if (tmpFileResult.status===200) {
+                    fileReulst=tmpFileResult.data;
+                }
+            }
             this.$refs.fileComponent.ImageList=fileReulst;
         },
     },
