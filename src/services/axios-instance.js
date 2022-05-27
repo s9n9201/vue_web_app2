@@ -1,12 +1,12 @@
 import axios from "axios"
-let serverAddress=["localhost", "114.46.147.253"];
+let serverAddress=["http://localhost:1015", "https://charmierp.com/backend"];
 
 serverAddress=serverAddress.filter((ip)=>{
-    return location.host.indexOf(ip)>-1;
+    return ip.indexOf(location.hostname)>-1;
 });
 
 const instance=axios.create({
-    baseURL: "http://"+serverAddress[0]+":1015",
+    baseURL: serverAddress[0],
     headers: {
         "Content-Type": "application/json",
     },
